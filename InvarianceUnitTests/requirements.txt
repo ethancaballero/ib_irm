@@ -1,0 +1,7 @@
+numpy
+torch
+gitpython 
+submitit
+pandas
+matplotlib
+python-git
