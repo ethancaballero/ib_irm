@@ -9,6 +9,7 @@ import os
 import datasets
 import models
 import utils
+import torch
 
 
 def run_experiment(args):
@@ -69,6 +70,18 @@ def run_experiment(args):
         callback=args["callback"])
 
     print([_ for _ in model.parameters()])
+
+    if args["bias"]:
+        edge = 1
+    else:
+        edge = 0
+
+    params = [_ for _ in model.parameters()][-(1+edge)]
+    params_inv = params[0][:args["dim_inv"]]
+    params_spur = params[0][args["dim_inv"]:]
+
+    norm = torch.norm(params_spur)/torch.norm(params)
+    print("norm:", norm.data.item())
 
     # compute the train, validation and test errors
     for split in ("train", "validation", "test"):
