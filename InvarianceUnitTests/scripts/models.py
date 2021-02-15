@@ -9,14 +9,15 @@ from torch.autograd import grad
 
 
 class Model(torch.nn.Module):
-    def __init__(self, in_features, out_features, task, hparams="default"):
+    def __init__(self, in_features, out_features, bias, task, hparams="default"):
         super().__init__()
         self.in_features = in_features
         self.out_features = out_features
+        self.bias = bias
         self.task = task
 
         # network architecture
-        self.network = torch.nn.Linear(in_features, out_features)
+        self.network = torch.nn.Linear(in_features, out_features, bias)
 
         # loss
         if self.task == "regression":
@@ -43,12 +44,12 @@ class Model(torch.nn.Module):
 
 
 class ERM(Model):
-    def __init__(self, in_features, out_features, task, hparams="default"):
+    def __init__(self, in_features, out_features, bias, task, hparams="default"):
         self.HPARAMS = {}
         self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, -2))
         self.HPARAMS['wd'] = (0., 10**random.uniform(-6, -2))
 
-        super().__init__(in_features, out_features, task, hparams)
+        super().__init__(in_features, out_features, bias, task, hparams)
 
         self.optimizer = torch.optim.Adam(
             self.network.parameters(),
@@ -73,12 +74,12 @@ class ERM(Model):
 
 
 class IB_ERM(Model):
-    def __init__(self, in_features, out_features, task, hparams="default"):
+    def __init__(self, in_features, out_features, bias, task, hparams="default"):
         self.HPARAMS = {}
         self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, -2))
         self.HPARAMS['wd'] = (0., 10**random.uniform(-6, -2))
 
-        super().__init__(in_features, out_features, task, hparams)
+        super().__init__(in_features, out_features, bias, task, hparams)
 
         self.optimizer = torch.optim.Adam(
             self.network.parameters(),
@@ -109,13 +110,13 @@ class REx(Model):
     """
 
     def __init__(
-            self, in_features, out_features, task, hparams="default", version=1):
+            self, in_features, out_features, bias, task, hparams="default", version=1):
         self.HPARAMS = {}
         self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, -2))
         self.HPARAMS['wd'] = (0., 10**random.uniform(-6, -2))
         self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
 
-        super().__init__(in_features, out_features, task, hparams)
+        super().__init__(in_features, out_features, bias, task, hparams)
         self.version = version
 
         self.network = self.IRMLayer(self.network)
@@ -204,13 +205,13 @@ class IRM(Model):
     """
 
     def __init__(
-            self, in_features, out_features, task, hparams="default", version=1):
+            self, in_features, out_features, bias, task, hparams="default", version=1):
         self.HPARAMS = {}
         self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, -2))
         self.HPARAMS['wd'] = (0., 10**random.uniform(-6, -2))
         self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
 
-        super().__init__(in_features, out_features, task, hparams)
+        super().__init__(in_features, out_features, bias, task, hparams)
         self.version = version
 
         self.network = self.IRMLayer(self.network)
@@ -296,8 +297,8 @@ class IRMv1(IRM):
     From https://arxiv.org/abs/1907.02893v1 
     """
 
-    def __init__(self, in_features, out_features, task, hparams="default"):
-        super().__init__(in_features, out_features, task, hparams, version=1)
+    def __init__(self, in_features, out_features, bias, task, hparams="default"):
+        super().__init__(in_features, out_features, bias, task, hparams, version=1)
 
 
 class IB_IRM(Model):
@@ -306,13 +307,13 @@ class IB_IRM(Model):
     """
 
     def __init__(
-            self, in_features, out_features, task, hparams="default", version=1):
+            self, in_features, out_features, bias, task, hparams="default", version=1):
         self.HPARAMS = {}
         self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, -2))
         self.HPARAMS['wd'] = (0., 10**random.uniform(-6, -2))
         self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
 
-        super().__init__(in_features, out_features, task, hparams)
+        super().__init__(in_features, out_features, bias, task, hparams)
         self.version = version
 
         self.network = self.IRMLayer(self.network)
@@ -409,12 +410,12 @@ class AndMask(Model):
     From https://arxiv.org/abs/2009.00329
     """
 
-    def __init__(self, in_features, out_features, task, hparams="default"):
+    def __init__(self, in_features, out_features, bias, task, hparams="default"):
         self.HPARAMS = {}
         self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, 0))
         self.HPARAMS['wd'] = (0., 10**random.uniform(-5, 0))
         self.HPARAMS["tau"] = (0.9, random.uniform(0.8, 1))
-        super().__init__(in_features, out_features, task, hparams)
+        super().__init__(in_features, out_features, bias, task, hparams)
 
     def fit(self, envs, num_iterations, callback=False):
         for epoch in range(num_iterations):
@@ -471,12 +472,12 @@ class IB_AndMask(Model):
     From https://arxiv.org/abs/2009.00329
     """
 
-    def __init__(self, in_features, out_features, task, hparams="default"):
+    def __init__(self, in_features, out_features, bias, task, hparams="default"):
         self.HPARAMS = {}
         self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, 0))
         self.HPARAMS['wd'] = (0., 10**random.uniform(-5, 0))
         self.HPARAMS["tau"] = (0.9, random.uniform(0.8, 1))
-        super().__init__(in_features, out_features, task, hparams)
+        super().__init__(in_features, out_features, bias, task, hparams)
 
     def fit(self, envs, num_iterations, callback=False):
         for epoch in range(num_iterations):
@@ -537,12 +538,12 @@ class IGA(Model):
     From https://arxiv.org/abs/2008.01883v2
     """
 
-    def __init__(self, in_features, out_features, task, hparams="default"):
+    def __init__(self, in_features, out_features, bias, task, hparams="default"):
         self.HPARAMS = {}
         self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, -2))
         self.HPARAMS['wd'] = (0., 10**random.uniform(-6, -2))
         self.HPARAMS['penalty'] = (1000, 10**random.uniform(1, 5))
-        super().__init__(in_features, out_features, task, hparams)
+        super().__init__(in_features, out_features, bias, task, hparams)
 
         self.optimizer = torch.optim.Adam(
             self.parameters(),

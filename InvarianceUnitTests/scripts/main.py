@@ -54,6 +54,7 @@ def run_experiment(args):
     model = models.MODELS[args["model"]](
         in_features=args["num_dim"],
         out_features=1,
+        bias=args["bias"],
         task=dataset.task,
         hparams=args["hparams"]
     )
@@ -67,6 +68,8 @@ def run_experiment(args):
         num_iterations=args["num_iterations"],
         callback=args["callback"])
 
+    print([_ for _ in model.parameters()])
+
     # compute the train, validation and test errors
     for split in ("train", "validation", "test"):
         key = "error_" + split
@@ -79,6 +82,8 @@ def run_experiment(args):
     results_file.close()
     return args
 
+def str2bool(v):
+  return v.lower() in ("yes", "true", "t", "1")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Synthetic invariances')
@@ -94,6 +99,7 @@ if __name__ == "__main__":
     parser.add_argument('--model_seed', type=int, default=0)
     parser.add_argument('--output_dir', type=str, default="results")
     parser.add_argument('--callback', action='store_true')
+    parser.add_argument('--bias', type=str2bool, default=True)
 
     #example 2 mods
     parser.add_argument('--snr_fg', type=float, default=1e-2)
