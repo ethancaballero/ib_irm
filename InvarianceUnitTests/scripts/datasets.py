@@ -10,8 +10,9 @@ class Example1:
     Cause and effect of a target with heteroskedastic noise
     """
 
-    def __init__(self, dim_inv, dim_spu, n_envs):
+    def __init__(self, args, dim_inv, dim_spu, n_envs):
         self.scramble = torch.eye(dim_inv + dim_spu)
+        self.args = args
         self.dim_inv = dim_inv
         self.dim_spu = dim_spu
         self.dim = dim_inv + dim_spu
@@ -52,8 +53,9 @@ class Example2:
     Cows and camels
     """
 
-    def __init__(self, dim_inv, dim_spu, n_envs):
+    def __init__(self, args, dim_inv, dim_spu, n_envs):
         self.scramble = torch.eye(dim_inv + dim_spu)
+        self.args = args
         self.dim_inv = dim_inv
         self.dim_spu = dim_spu
         self.dim = dim_inv + dim_spu
@@ -77,8 +79,10 @@ class Example2:
         print("Environments variables:", self.envs)
 
         # foreground is 100x noisier than background
-        self.snr_fg = 1e-2
-        self.snr_bg = 1
+        #self.snr_fg = 1e-2
+        #self.snr_bg = 1
+        self.snr_fg = self.args["snr_fg"]
+        self.snr_bg = self.args["snr_bg"]
 
         # foreground (fg) denotes animal (cow / camel)
         cow = torch.ones(1, self.dim_inv)
@@ -93,11 +97,18 @@ class Example2:
         s = self.envs[env]["s"]
         w = torch.Tensor([p, 1 - p] * 2) * torch.Tensor([s] * 2 + [1 - s] * 2)
         i = torch.multinomial(w, n, True)
+        """
         x = torch.cat((
             (torch.randn(n, self.dim_inv) /
                 math.sqrt(10) + self.avg_fg[i]) * self.snr_fg,
             (torch.randn(n, self.dim_spu) /
                 math.sqrt(10) + self.avg_bg[i]) * self.snr_bg), -1)
+        #"""
+        x = torch.cat((
+            (torch.randn(n, self.dim_inv) /
+                math.sqrt(self.args["inv_var"]) + self.avg_fg[i]) * self.snr_fg,
+            (torch.randn(n, self.dim_spu) /
+                math.sqrt(self.args["spur_var"]) + self.avg_bg[i]) * self.snr_bg), -1)
 
         if split == "test":
             x[:, self.dim_spu:] = x[torch.randperm(len(x)), self.dim_spu:]
@@ -113,8 +124,9 @@ class Example3:
     Small invariant margin versus large spurious margin
     """
 
-    def __init__(self, dim_inv, dim_spu, n_envs):
+    def __init__(self, args, dim_inv, dim_spu, n_envs):
         self.scramble = torch.eye(dim_inv + dim_spu)
+        self.args = args
         self.dim_inv = dim_inv
         self.dim_spu = dim_spu
         self.dim = dim_inv + dim_spu
@@ -150,22 +162,22 @@ class Example3:
 
 
 class Example1s(Example1):
-    def __init__(self, dim_inv, dim_spu, n_envs):
-        super().__init__(dim_inv, dim_spu, n_envs)
+    def __init__(self, args, dim_inv, dim_spu, n_envs):
+        super().__init__(args, dim_inv, dim_spu, n_envs)
 
         self.scramble, _ = torch.qr(torch.randn(self.dim, self.dim))
 
 
 class Example2s(Example2):
-    def __init__(self, dim_inv, dim_spu, n_envs):
-        super().__init__(dim_inv, dim_spu, n_envs)
+    def __init__(self, args, dim_inv, dim_spu, n_envs):
+        super().__init__(args, dim_inv, dim_spu, n_envs)
 
         self.scramble, _ = torch.qr(torch.randn(self.dim, self.dim))
 
 
 class Example3s(Example3):
-    def __init__(self, dim_inv, dim_spu, n_envs):
-        super().__init__(dim_inv, dim_spu, n_envs)
+    def __init__(self, args, dim_inv, dim_spu, n_envs):
+        super().__init__(args, dim_inv, dim_spu, n_envs)
 
         self.scramble, _ = torch.qr(torch.randn(self.dim, self.dim))
 
