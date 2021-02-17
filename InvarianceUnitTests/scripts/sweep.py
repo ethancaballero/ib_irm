@@ -7,6 +7,8 @@ import datasets
 import argparse
 import getpass
 
+def str2bool(v):
+  return v.lower() in ("yes", "true", "t", "1")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Synthetic invariances')
@@ -24,6 +26,15 @@ if __name__ == "__main__":
     parser.add_argument('--callback', action='store_true')
     parser.add_argument('--cluster', action="store_true")
     parser.add_argument('--jobs_cluster', type=int, default=512)
+
+    parser.add_argument('--bias', type=str2bool, default=True)
+
+    #example 2 mods
+    parser.add_argument('--snr_fg', type=float, default=1e-2)
+    parser.add_argument('--snr_bg', type=float, default=1)
+    parser.add_argument('--inv_var', type=float, default=10)
+    parser.add_argument('--spur_var', type=float, default=10)
+
     args = vars(parser.parse_args())
 
     try:
@@ -58,7 +69,14 @@ if __name__ == "__main__":
                         "data_seed": data_seed,
                         "model_seed": model_seed,
                         "output_dir": args["output_dir"],
-                        "callback": args["callback"]
+                        "callback": args["callback"],
+
+                        "bias": args["bias"],
+
+                        "snr_fg": args["snr_fg"],
+                        "snr_bg": args["snr_bg"],
+                        "inv_var": args["inv_var"],
+                        "spur_var": args["spur_var"]
                     }
 
                     all_jobs.append(train_args)
