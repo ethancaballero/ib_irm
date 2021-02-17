@@ -78,6 +78,7 @@ class IB_ERM(Model):
         self.HPARAMS = {}
         self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, -2))
         self.HPARAMS['wd'] = (0., 10**random.uniform(-6, -2))
+        self.HPARAMS['ib_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
 
         super().__init__(in_features, out_features, bias, task, hparams)
 
@@ -93,7 +94,7 @@ class IB_ERM(Model):
         for epoch in range(num_iterations):
             self.optimizer.zero_grad()
             logits = self.network(x)
-            loss = self.loss(logits, y) + .9 * logits.var(0).mean()
+            loss = self.loss(logits, y) + self.hparams["ib_lambda"] * logits.var(0).mean()
             loss.backward()
             self.optimizer.step()
 
@@ -114,7 +115,7 @@ class REx(Model):
         self.HPARAMS = {}
         self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, -2))
         self.HPARAMS['wd'] = (0., 10**random.uniform(-6, -2))
-        self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
+        self.HPARAMS['rex_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
 
         super().__init__(in_features, out_features, bias, task, hparams)
         self.version = version
@@ -184,8 +185,8 @@ class REx(Model):
                         raise NotImplementedError
             #"""
 
-            obj = (1 - self.hparams["irm_lambda"]) * losses_avg
-            obj += self.hparams["irm_lambda"] * penalty
+            obj = (1 - self.hparams["rex_lambda"]) * losses_avg
+            obj += self.hparams["rex_lambda"] * penalty
 
             self.optimizer.zero_grad()
             obj.backward()
@@ -312,6 +313,7 @@ class IB_IRM(Model):
         self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, -2))
         self.HPARAMS['wd'] = (0., 10**random.uniform(-6, -2))
         self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
+        self.HPARAMS['ib_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
 
         super().__init__(in_features, out_features, bias, task, hparams)
         self.version = version
@@ -390,7 +392,7 @@ class IB_IRM(Model):
             obj = (1 - self.hparams["irm_lambda"]) * losses_avg
             obj += self.hparams["irm_lambda"] * penalty
 
-            obj += self.hparams["irm_lambda"] * logit_penalty
+            obj += self.hparams["ib_lambda"] * logit_penalty
 
             self.optimizer.zero_grad()
             obj.backward()
@@ -477,6 +479,7 @@ class IB_AndMask(Model):
         self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, 0))
         self.HPARAMS['wd'] = (0., 10**random.uniform(-5, 0))
         self.HPARAMS["tau"] = (0.9, random.uniform(0.8, 1))
+        self.HPARAMS['ib_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
         super().__init__(in_features, out_features, bias, task, hparams)
 
     def fit(self, envs, num_iterations, callback=False):
@@ -486,7 +489,7 @@ class IB_AndMask(Model):
             for x, y in envs["train"]["envs"]:
                 logit = self.network(x)
                 #logits.append(logit)
-                loss = self.loss(logit, y) + .9 * logit.var(0).mean()
+                loss = self.loss(logit, y) + self.hparams["ib_lambda"] * logit.var(0).mean()
                 losses.append(loss)
             self.mask_step(
                 losses, list(self.parameters()),
