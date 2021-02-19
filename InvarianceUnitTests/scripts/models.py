@@ -48,6 +48,7 @@ class ERM(Model):
         self.HPARAMS = {}
         self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, -2))
         self.HPARAMS['wd'] = (0., 10**random.uniform(-6, -2))
+        self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
 
         super().__init__(in_features, out_features, bias, task, hparams)
 
@@ -61,8 +62,13 @@ class ERM(Model):
         y = torch.cat([ye for xe, ye in envs["train"]["envs"]])
 
         for epoch in range(num_iterations):
+            if self.bias:
+                params = torch.cat([[_ for _ in self.network.parameters()][-2].squeeze(), [_ for _ in self.network.parameters()][-1]])
+            else:
+                params = [_ for _ in self.network.parameters()][-1]
+            l1_penalty = torch.norm(params, 1)
             self.optimizer.zero_grad()
-            self.loss(self.network(x), y).backward()
+            (self.loss(self.network(x), y) + self.hparams["l1"] * l1_penalty).backward()
             self.optimizer.step()
 
             if callback:
@@ -78,6 +84,7 @@ class IB_ERM(Model):
         self.HPARAMS = {}
         self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, -2))
         self.HPARAMS['wd'] = (0., 10**random.uniform(-6, -2))
+        self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
         self.HPARAMS['ib_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
 
         super().__init__(in_features, out_features, bias, task, hparams)
@@ -92,9 +99,14 @@ class IB_ERM(Model):
         y = torch.cat([ye for xe, ye in envs["train"]["envs"]])
 
         for epoch in range(num_iterations):
+            if self.bias:
+                params = torch.cat([[_ for _ in self.network.parameters()][-2].squeeze(), [_ for _ in self.network.parameters()][-1]])
+            else:
+                params = [_ for _ in self.network.parameters()][-1]
+            l1_penalty = torch.norm(params, 1)
             self.optimizer.zero_grad()
             logits = self.network(x)
-            loss = self.loss(logits, y) + self.hparams["ib_lambda"] * logits.var(0).mean()
+            loss = self.loss(logits, y) + self.hparams["ib_lambda"] * logits.var(0).mean() + self.hparams["l1"] * l1_penalty
             loss.backward()
             self.optimizer.step()
 
@@ -115,6 +127,7 @@ class REx(Model):
         self.HPARAMS = {}
         self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, -2))
         self.HPARAMS['wd'] = (0., 10**random.uniform(-6, -2))
+        self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
         self.HPARAMS['rex_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
 
         super().__init__(in_features, out_features, bias, task, hparams)
@@ -185,8 +198,15 @@ class REx(Model):
                         raise NotImplementedError
             #"""
 
+            if self.bias:
+                params = torch.cat([[_ for _ in self.network.parameters()][-2].squeeze(), [_ for _ in self.network.parameters()][-1]])
+            else:
+                params = [_ for _ in self.network.parameters()][-1]
+            l1_penalty = torch.norm(params, 1)
+
             obj = (1 - self.hparams["rex_lambda"]) * losses_avg
             obj += self.hparams["rex_lambda"] * penalty
+            obj += self.hparams["l1"] * l1_penalty
 
             self.optimizer.zero_grad()
             obj.backward()
@@ -210,6 +230,7 @@ class IRM(Model):
         self.HPARAMS = {}
         self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, -2))
         self.HPARAMS['wd'] = (0., 10**random.uniform(-6, -2))
+        self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
         self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
 
         super().__init__(in_features, out_features, bias, task, hparams)
@@ -277,8 +298,15 @@ class IRM(Model):
                     else:
                         raise NotImplementedError
 
+            if self.bias:
+                params = torch.cat([[_ for _ in self.network.parameters()][-2].squeeze(), [_ for _ in self.network.parameters()][-1]])
+            else:
+                params = [_ for _ in self.network.parameters()][-1]
+            l1_penalty = torch.norm(params, 1)
+
             obj = (1 - self.hparams["irm_lambda"]) * losses_avg
             obj += self.hparams["irm_lambda"] * penalty
+            obj += self.hparams["l1"] * l1_penalty
 
             self.optimizer.zero_grad()
             obj.backward()
@@ -312,6 +340,7 @@ class IB_IRM(Model):
         self.HPARAMS = {}
         self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, -2))
         self.HPARAMS['wd'] = (0., 10**random.uniform(-6, -2))
+        self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
         self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
         self.HPARAMS['ib_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
 
@@ -389,10 +418,17 @@ class IB_IRM(Model):
                     else:
                         raise NotImplementedError
 
+            if self.bias:
+                params = torch.cat([[_ for _ in self.network.parameters()][-2].squeeze(), [_ for _ in self.network.parameters()][-1]])
+            else:
+                params = [_ for _ in self.network.parameters()][-1]
+            l1_penalty = torch.norm(params, 1)
+
             obj = (1 - self.hparams["irm_lambda"]) * losses_avg
             obj += self.hparams["irm_lambda"] * penalty
 
             obj += self.hparams["ib_lambda"] * logit_penalty
+            obj += self.hparams["l1"] * l1_penalty
 
             self.optimizer.zero_grad()
             obj.backward()
@@ -416,12 +452,18 @@ class AndMask(Model):
         self.HPARAMS = {}
         self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, 0))
         self.HPARAMS['wd'] = (0., 10**random.uniform(-5, 0))
+        self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
         self.HPARAMS["tau"] = (0.9, random.uniform(0.8, 1))
         super().__init__(in_features, out_features, bias, task, hparams)
 
     def fit(self, envs, num_iterations, callback=False):
         for epoch in range(num_iterations):
-            losses = [self.loss(self.network(x), y)
+            if self.bias:
+                params = torch.cat([[_ for _ in self.network.parameters()][-2].squeeze(), [_ for _ in self.network.parameters()][-1]])
+            else:
+                params = [_ for _ in self.network.parameters()][-1]
+            l1_penalty = torch.norm(params, 1)
+            losses = [self.loss(self.network(x), y) + self.hparams["l1"] * l1_penalty
                       for x, y in envs["train"]["envs"]]
             self.mask_step(
                 losses, list(self.parameters()),
@@ -478,6 +520,7 @@ class IB_AndMask(Model):
         self.HPARAMS = {}
         self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, 0))
         self.HPARAMS['wd'] = (0., 10**random.uniform(-5, 0))
+        self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
         self.HPARAMS["tau"] = (0.9, random.uniform(0.8, 1))
         self.HPARAMS['ib_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
         super().__init__(in_features, out_features, bias, task, hparams)
@@ -487,9 +530,14 @@ class IB_AndMask(Model):
             logits = []
             losses = []
             for x, y in envs["train"]["envs"]:
+                if self.bias:
+                    params = torch.cat([[_ for _ in self.network.parameters()][-2].squeeze(), [_ for _ in self.network.parameters()][-1]])
+                else:
+                    params = [_ for _ in self.network.parameters()][-1]
+                l1_penalty = torch.norm(params, 1)
                 logit = self.network(x)
                 #logits.append(logit)
-                loss = self.loss(logit, y) + self.hparams["ib_lambda"] * logit.var(0).mean()
+                loss = self.loss(logit, y) + self.hparams["ib_lambda"] * logit.var(0).mean() + self.hparams["l1"] * l1_penalty
                 losses.append(loss)
             self.mask_step(
                 losses, list(self.parameters()),
@@ -545,6 +593,7 @@ class IGA(Model):
         self.HPARAMS = {}
         self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, -2))
         self.HPARAMS['wd'] = (0., 10**random.uniform(-6, -2))
+        self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
         self.HPARAMS['penalty'] = (1000, 10**random.uniform(1, 5))
         super().__init__(in_features, out_features, bias, task, hparams)
 
@@ -555,6 +604,11 @@ class IGA(Model):
 
     def fit(self, envs, num_iterations, callback=False):
         for epoch in range(num_iterations):
+            if self.bias:
+                params = torch.cat([[_ for _ in self.network.parameters()][-2].squeeze(), [_ for _ in self.network.parameters()][-1]])
+            else:
+                params = [_ for _ in self.network.parameters()][-1]
+            l1_penalty = torch.norm(params, 1)
             losses = [self.loss(self.network(x), y)
                       for x, y in envs["train"]["envs"]]
             gradients = [
@@ -572,7 +626,7 @@ class IGA(Model):
                     penalty_value += (gradient_i - avg_grad_i).pow(2).sum()
 
             self.optimizer.zero_grad()
-            (avg_loss + self.hparams['penalty'] * penalty_value).backward()
+            (avg_loss + self.hparams['penalty'] * penalty_value + self.hparams["l1"] * l1_penalty).backward()
             self.optimizer.step()
 
             if callback:
