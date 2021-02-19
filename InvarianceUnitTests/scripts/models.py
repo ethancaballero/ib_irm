@@ -452,18 +452,21 @@ class AndMask(Model):
         self.HPARAMS = {}
         self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, 0))
         self.HPARAMS['wd'] = (0., 10**random.uniform(-5, 0))
-        self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
+        #self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
         self.HPARAMS["tau"] = (0.9, random.uniform(0.8, 1))
         super().__init__(in_features, out_features, bias, task, hparams)
 
     def fit(self, envs, num_iterations, callback=False):
         for epoch in range(num_iterations):
+            """
             if self.bias:
                 params = torch.cat([[_ for _ in self.network.parameters()][-2].squeeze(), [_ for _ in self.network.parameters()][-1]])
             else:
                 params = [_ for _ in self.network.parameters()][-1]
             l1_penalty = torch.norm(params, 1)
             losses = [self.loss(self.network(x), y) + self.hparams["l1"] * l1_penalty
+            #"""
+            losses = [self.loss(self.network(x), y)
                       for x, y in envs["train"]["envs"]]
             self.mask_step(
                 losses, list(self.parameters()),
@@ -520,7 +523,7 @@ class IB_AndMask(Model):
         self.HPARAMS = {}
         self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, 0))
         self.HPARAMS['wd'] = (0., 10**random.uniform(-5, 0))
-        self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
+        #self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
         self.HPARAMS["tau"] = (0.9, random.uniform(0.8, 1))
         self.HPARAMS['ib_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
         super().__init__(in_features, out_features, bias, task, hparams)
@@ -530,14 +533,17 @@ class IB_AndMask(Model):
             logits = []
             losses = []
             for x, y in envs["train"]["envs"]:
+                """
                 if self.bias:
                     params = torch.cat([[_ for _ in self.network.parameters()][-2].squeeze(), [_ for _ in self.network.parameters()][-1]])
                 else:
                     params = [_ for _ in self.network.parameters()][-1]
                 l1_penalty = torch.norm(params, 1)
+                #"""
                 logit = self.network(x)
                 #logits.append(logit)
-                loss = self.loss(logit, y) + self.hparams["ib_lambda"] * logit.var(0).mean() + self.hparams["l1"] * l1_penalty
+                #loss = self.loss(logit, y) + self.hparams["ib_lambda"] * logit.var(0).mean() + self.hparams["l1"] * l1_penalty
+                loss = self.loss(logit, y) + self.hparams["ib_lambda"] * logit.var(0).mean()
                 losses.append(loss)
             self.mask_step(
                 losses, list(self.parameters()),
