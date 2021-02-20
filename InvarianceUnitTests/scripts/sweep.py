@@ -6,6 +6,13 @@ import models
 import datasets
 import argparse
 import getpass
+import subprocess
+
+def ask_for_confirmation():
+    response = input('Are you sure? (y/n) ')
+    if not response.lower().strip()[:1] == "y":
+        print('Nevermind!')
+        exit(0)
 
 def str2bool(v):
   return v.lower() in ("yes", "true", "t", "1")
@@ -26,6 +33,7 @@ if __name__ == "__main__":
     parser.add_argument('--callback', action='store_true')
     parser.add_argument('--cluster', action="store_true")
     parser.add_argument('--jobs_cluster', type=int, default=512)
+    parser.add_argument('--skip_confirmation', type=str2bool, default=False)
 
     parser.add_argument('--bias', type=str2bool, default=True)
 
@@ -98,5 +106,14 @@ if __name__ == "__main__":
 
         executor.map_array(main.run_experiment, all_jobs)
     else:
+        """
         for job in all_jobs:
             print(main.run_experiment(job))
+        #"""
+        cmd = "python3 scripts/main.py"
+        if not args["skip_confirmation"]:
+            ask_for_confirmation()
+        for job in all_jobs:
+            for j in job:
+                cmd += " --" + j + " " + str(job[j])
+            subprocess.Popen(cmd, shell=True)

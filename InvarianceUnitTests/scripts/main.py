@@ -111,7 +111,8 @@ if __name__ == "__main__":
     parser.add_argument('--data_seed', type=int, default=0)
     parser.add_argument('--model_seed', type=int, default=0)
     parser.add_argument('--output_dir', type=str, default="results")
-    parser.add_argument('--callback', action='store_true')
+    #parser.add_argument('--callback', action='store_true')
+    parser.add_argument('--callback', type=str2bool, default=False)
     
     parser.add_argument('--bias', type=str2bool, default=True)
 
