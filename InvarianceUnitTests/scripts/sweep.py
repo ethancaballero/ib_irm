@@ -106,10 +106,11 @@ if __name__ == "__main__":
 
         executor.map_array(main.run_experiment, all_jobs)
     else:
-        """
+        #"""
         for job in all_jobs:
             print(main.run_experiment(job))
         #"""
+        """
         cmd = "python3 scripts/main.py"
         if not args["skip_confirmation"]:
             ask_for_confirmation()
@@ -117,3 +118,4 @@ if __name__ == "__main__":
             for j in job:
                 cmd += " --" + j + " " + str(job[j])
             subprocess.Popen(cmd, shell=True)
+        #"""
