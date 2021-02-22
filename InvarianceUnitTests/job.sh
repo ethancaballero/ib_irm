@@ -18,3 +18,4 @@ python scripts/sweep.py --skip_confirmation True --models ERM --datasets Example
 
 # 5. Copy whatever you want to save on $SCRATCH
 # cp $SLURM_TMPDIR/<to_save> $SCRATCH
+cp -R /home/ethancab/research/invariance_unit_test/ib_irm/InvarianceUnitTests/results /home/ethancab/scratch
