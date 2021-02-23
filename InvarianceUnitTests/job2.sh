@@ -6,7 +6,9 @@
 #SBATCH --time=3:00:00                   # The job will run for 3 hours
 #SBATCH -o /scratch/<user>/slurm-%j.out  # Write the log in $SCRATCH
 
-echo "agi oh yeah" >> myfile.txt
+cd $SLURM_TMPDIR
+
+echo "some text" >> myfile.txt
 
 # 5. Copy whatever you want to save on $SCRATCH
 cp $SLURM_TMPDIR/myfile.txt $SCRATCH
