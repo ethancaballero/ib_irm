@@ -4,7 +4,7 @@
 #SBATCH --gres=gpu:0                     # Ask for 0 GPU
 #SBATCH --mem=752G                        # Ask for 752 GB of RAM
 #SBATCH --time=3:00:00                   # The job will run for 3 hours
-#SBATCH -o /scratch/<user>/slurm-%j.out  # Write the log in $SCRATCH
+#SBATCH -o /scratch/ethancab/slurm-%j.out  # Write the log in $SCRATCH
 
 # 1. Create your environement locally
 module load python/3.8
@@ -18,4 +18,4 @@ python scripts/sweep.py --skip_confirmation True --models ERM --datasets Example
 
 # 5. Copy whatever you want to save on $SCRATCH
 # cp $SLURM_TMPDIR/<to_save> $SCRATCH
-cp -R /home/ethancab/research/invariance_unit_test/ib_irm/InvarianceUnitTests/results /home/ethancab/scratch
+cp -R /home/ethancab/research/invariance_unit_test/ib_irm/InvarianceUnitTests/results $SCRATCH
