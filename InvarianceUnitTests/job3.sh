@@ -6,9 +6,9 @@
 #SBATCH --time=3:00:00                   # The job will run for 3 hours
 #SBATCH -o /scratch/ethancab/slurm-%j.out  # Write the log in $SCRATCH
 
-cd $SLURM_TMPDIR
+cd /home/ethancab/research/_idk
 
-echo $1 >> myfile.txt
+echo "some text" >> myfile.txt
 
 # 5. Copy whatever you want to save on $SCRATCH
-cp $SLURM_TMPDIR/myfile.txt $SCRATCH
+cp /home/ethancab/research/_idk/myfile.txt $SCRATCH

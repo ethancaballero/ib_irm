@@ -27,8 +27,18 @@ if __name__ == "__main__":
     parser.add_argument('--dim_spu', type=int, default=5)
     parser.add_argument('--n_envs', type=int, default=3)
     parser.add_argument('--num_samples', type=int, default=10000)
-    parser.add_argument('--num_data_seeds', type=int, default=50)
-    parser.add_argument('--num_model_seeds', type=int, default=20)
+    #parser.add_argument('--num_data_seeds', type=int, default=50)
+    #parser.add_argument('--num_model_seeds', type=int, default=20)
+
+    parser.add_argument('--m_start', default=0, type=int,
+                        help='')
+    parser.add_argument('--m_end', default=20, type=int,
+                        help='')
+    parser.add_argument('--d_start', default=0, type=int,
+                        help='')
+    parser.add_argument('--d_end', default=50, type=int,
+                        help='')
+    
     parser.add_argument('--output_dir', type=str, default="results")
     parser.add_argument('--callback', action='store_true')
     parser.add_argument('--cluster', action="store_true")
@@ -63,8 +73,8 @@ if __name__ == "__main__":
 
     for model in model_lists:
         for dataset in dataset_lists:
-            for data_seed in range(args["num_data_seeds"]):
-                for model_seed in range(args["num_model_seeds"]):
+            for data_seed in range(args["d_start"], args["d_end"]):
+                for model_seed in range(args["m_start"], args["m_end"]):
                     train_args = {
                         "model": model,
                         "num_iterations": args["num_iterations"],
