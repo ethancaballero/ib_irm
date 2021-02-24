@@ -1,12 +1,14 @@
 #!/bin/bash
 #SBATCH --account=rrg-bengioy-ad         # Yoshua pays for your job
-#SBATCH --cpus-per-task=40                # Ask for 40 CPUs
+#SBATCH --cpus-per-task=6                # Ask for 40 CPUs
 #SBATCH --gres=gpu:0                     # Ask for 0 GPU
-#SBATCH --mem=752G                        # Ask for 752 GB of RAM
+#SBATCH --mem=32G                        # Ask for 752 GB of RAM
 #SBATCH --time=3:00:00                   # The job will run for 3 hours
 #SBATCH -o /scratch/ethancab/slurm-%j.out  # Write the log in $SCRATCH
 
 #!/usr/bin/env bash
+
+# max cpu is 40 and max mem is 752G
 
 argparse(){
     argparser=$(mktemp 2>/dev/null || mktemp -t argparser)
