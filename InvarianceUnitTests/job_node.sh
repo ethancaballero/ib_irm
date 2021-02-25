@@ -3,7 +3,7 @@
 #SBATCH --cpus-per-task=6                # Ask for 40 CPUs
 #SBATCH --gres=gpu:0                     # Ask for 0 GPU
 #SBATCH --mem=32G                        # Ask for 752 GB of RAM
-#SBATCH --time=3:00:00                   # The job will run for 3 hours
+#SBATCH --time=1:00:00                   # The job will run for 3 hours
 #SBATCH -o /scratch/ethancab/slurm-%j.out  # Write the log in $SCRATCH
 
 #!/usr/bin/env bash
