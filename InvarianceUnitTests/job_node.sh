@@ -86,4 +86,5 @@ EOF
 #echo the answer: $M_START
 #echo the answer: $M_END
 
-python scripts/sweep.py --skip_confirmation True --models ERM --datasets Example2 --num_samples 2 --m_start $M_START --m_end $M_END --d_start 0 --d_end 50
+#python scripts/sweep.py --skip_confirmation True --models ERM --datasets Example2 --num_samples 2 --m_start $M_START --m_end $M_END --d_start 0 --d_end 50
+python scripts/sweep.py --skip_confirmation True --models ERM --datasets Example2 --num_samples 2 --m_start $M_START --m_end $M_END --d_start 0 --d_end 1
