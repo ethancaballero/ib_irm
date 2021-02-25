@@ -6,13 +6,34 @@
 #SBATCH --time=1:00:00                   # The job will run for 3 hours
 #SBATCH -o /scratch/ethancab/slurm-%j.out  # Write the log in $SCRATCH
 
+# 1. Create your environement locally
+
+: '
+cd $SLURM_TMPDIR
+echo $1 >> myfile1.txt
+cp $SLURM_TMPDIR/myfile.txt $SCRATCH
+'
+
 module load python/3.8
 cd /home/ethancab
 source invariance_env/bin/activate
 cd /home/ethancab/research/invariance_unit_test/ib_irm/InvarianceUnitTests
 
-#python scripts/sweep.py --skip_confirmation True --models ERM --datasets Example2 --num_samples 2 --m_start $M_START --m_end $M_END --d_start 0 --d_end 50
-#python scripts/sweep.py --skip_confirmation True --models ERM --datasets Example2 --num_samples 2 --m_start $M_START --m_end $M_END --d_start 0 --d_end 1
+: '
+echo $2 >> myfile2.txt
+cp $SLURM_TMPDIR/myfile.txt $SCRATCH
+'
+
+#python scripts/sweep.py --models ERM IRMv1 IB_ERM IB_IRM --datasets Example2 --num_samples 2 --num_data_seeds 2 --num_model_seeds 2
+
+#python scripts/sweep.py --skip_confirmation True --models ERM --datasets Example2 --num_samples 2 --num_data_seeds 2 --num_model_seeds 2
+#python scripts/sweep.py --skip_confirmation True --models ERM --datasets Example2 --num_samples 2 --m_start 0 --m_end 1 --d_start 0 --d_end 1
 python scripts/sweep.py --skip_confirmation True --models ERM --datasets Example2 --num_samples 2 --m_start $1 --m_end $2 --d_start 0 --d_end 1
 
+#echo $2 >> myfile3.txt
+
+# 5. Copy whatever you want to save on $SCRATCH
+# cp $SLURM_TMPDIR/<to_save> $SCRATCH
 cp -R /home/ethancab/research/invariance_unit_test/ib_irm/InvarianceUnitTests/results $SCRATCH
+
+#echo $1 >> myfile4.txt

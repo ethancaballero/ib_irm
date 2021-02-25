@@ -8,6 +8,9 @@
 
 cd $SLURM_TMPDIR
 
+echo $1
+echo $2
+
 echo $1 >> myfile.txt
 
 # 5. Copy whatever you want to save on $SCRATCH
