@@ -82,6 +82,7 @@ def run_experiment(args):
 
     norm = torch.norm(params_spur)/torch.norm(params)
     print("norm:", norm.data.item())
+    args["norm"] = norm.data.item()
 
     # compute the train, validation and test errors
     for split in ("train", "validation", "test"):
