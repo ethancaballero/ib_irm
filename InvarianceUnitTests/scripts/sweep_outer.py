@@ -61,13 +61,12 @@ if __name__ == "__main__":
     if not args["skip_confirmation"]:
         ask_for_confirmation()
     args_copy = copy.deepcopy(args)
-    for i in range(args['d_end']):
+    for i in range(args['d_start'], args['d_end']):
         for j in args:
             if j == 'm_start': 
-                cmd += " --" + 'm_start' + " " + str(0)
+                cmd += " --" + 'm_start' + " " + str(args['m_start'])
             elif j == 'm_end': 
-                cmd += " --" + 'm_end' + " " + str(20)
-                #cmd += " --" + 'm_end' + " " + str(2)
+                cmd += " --" + 'm_end' + " " + str(args['m_end'])
             elif j == 'd_start':
                 cmd += " --" + 'd_start' + " " + str(i)
             elif j == 'd_end':
