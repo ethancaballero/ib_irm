@@ -40,6 +40,7 @@ if __name__ == "__main__":
                         help='')
     
     parser.add_argument('--output_dir', type=str, default="results")
+    parser.add_argument('--scratch_dir', type=str, default="None")
     #parser.add_argument('--callback', action='store_true')
     #parser.add_argument('--cluster', action="store_true")
     parser.add_argument('--callback', type=str2bool, default=False)
