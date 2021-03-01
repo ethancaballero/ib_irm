@@ -90,6 +90,7 @@ if __name__ == "__main__":
                         "data_seed": data_seed,
                         "model_seed": model_seed,
                         "output_dir": args["output_dir"],
+                        "scratch_dir": args["scratch_dir"],
                         "callback": args["callback"],
 
                         "bias": args["bias"],
