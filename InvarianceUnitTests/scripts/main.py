@@ -15,7 +15,11 @@ import torch
 def run_experiment(args):
     # build directory name
     commit = git.Repo(search_parent_directories=True).head.object.hexsha[:10]
-    results_dirname = os.path.join(args["output_dir"], commit + "/")
+    if args["scratch_dir"] == "None":
+        results_dirname = os.path.join(args["output_dir"], commit + "/")
+    else:
+        #scratch = '/scratch/ethancab'
+        results_dirname = args["scratch_dir"] + "/" + args["output_dir"] + "/" + commit + "/"
     os.makedirs(results_dirname, exist_ok=True)
 
     # build file name
@@ -112,6 +116,7 @@ if __name__ == "__main__":
     parser.add_argument('--data_seed', type=int, default=0)
     parser.add_argument('--model_seed', type=int, default=0)
     parser.add_argument('--output_dir', type=str, default="results")
+    parser.add_argument('--scratch_dir', type=str, default="None")
     #parser.add_argument('--callback', action='store_true')
     parser.add_argument('--callback', type=str2bool, default=False)
     
