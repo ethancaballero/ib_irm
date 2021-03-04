@@ -643,6 +643,149 @@ class IGA(Model):
         return self.network(x)
 
 
+class MLP(torch.nn.Module):
+    def __init__(self, in_features, out_features):
+        super(MLP, self).__init__()
+        #hidden_dim = 128
+        hidden_dim = 32
+        self.lin1 = torch.nn.Linear(in_features, hidden_dim)
+        self.lin2 = torch.nn.Linear(hidden_dim, hidden_dim)
+        self.lin3 = torch.nn.Linear(hidden_dim, out_features)
+        for lin in [self.lin1, self.lin2, self.lin3]:
+            torch.nn.init.xavier_uniform_(lin.weight)
+            torch.nn.init.zeros_(lin.bias)
+        #self._main = nn.Sequential(lin1, nn.ReLU(True), lin2, nn.ReLU(True), lin3)
+
+    def forward(self, x):
+        #import pdb; pdb.set_trace()
+        #x = x.view(x.shape[0], self.input_size)
+        x1 = x = self.lin1(x)
+        x2 = x = torch.nn.functional.elu(x)
+        x3 = x = self.lin2(x)
+        x4 = x = torch.nn.functional.elu(x)
+        x5 = x = self.lin3(x)
+        #out = self._main(out)
+        #import pdb; pdb.set_trace()
+        return x, x1, x2, x3, x4, x5
+
+class IB_IRM_NN(Model):
+    """
+    Abstract class for IRM
+    """
+    def __init__(
+            self, in_features, out_features, bias, task, hparams="default", version=1):
+        self.HPARAMS = {}
+        self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, -2))
+        self.HPARAMS['wd'] = (0., 10**random.uniform(-6, -2))
+        self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
+        self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
+        self.HPARAMS['ib_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
+        super().__init__(in_features, out_features, bias, task, hparams)
+        self.version = version
+        self.network = MLP(in_features, out_features)
+        self.network = self.IRMLayer(self.network)
+        self.net_parameters, self.net_dummies = self.find_parameters(
+            self.network)
+        self.optimizer = torch.optim.Adam(
+            self.net_parameters,
+            lr=self.hparams["lr"],
+            weight_decay=self.hparams["wd"])
+
+    def find_parameters(self, network):
+        """
+        Alternative to network.parameters() to separate real parameters
+        from dummmies.
+        """
+        parameters = []
+        dummies = []
+        for name, param in network.named_parameters():
+            if "dummy" in name:
+                dummies.append(param)
+            else:
+                parameters.append(param)
+        return parameters, dummies
+
+    class IRMLayer(torch.nn.Module):
+        """
+        Add a "multiply by one and sum zero" dummy operation to
+        any layer. Then you can take gradients with respect these
+        dummies. Often applied to Linear and Conv2d layers.
+        """
+        def __init__(self, layer):
+            super().__init__()
+            self.layer = layer
+            self.dummy_mul = torch.nn.Parameter(torch.Tensor([1.0]))
+            self.dummy_sum = torch.nn.Parameter(torch.Tensor([0.0]))
+
+        def forward(self, x):
+            x, x1, x2, x3, x4, x5 = self.layer(x)
+            return x * self.dummy_mul + self.dummy_sum, x1, x2, x3, x4, x5
+
+    def fit(self, envs, num_iterations, callback=False):
+        for epoch in range(num_iterations):
+            losses_env = []
+            gradients_env = []
+            logits_env = []
+            acts1_env = []
+            acts2_env = []
+            acts3_env = []
+            acts4_env = []
+            acts5_env = []
+            for x, y in envs["train"]["envs"]:
+                logits, a1, a2, a3, a4, a5 = self.network(x)
+                logits_env.append(logits)
+                acts1_env.append(a1)
+                acts2_env.append(a2)
+                acts3_env.append(a3)
+                acts4_env.append(a4)
+                acts5_env.append(a5)
+                losses_env.append(self.loss(logits, y))
+                gradients_env.append(grad(
+                    losses_env[-1], self.net_dummies, create_graph=True))
+            # penalty per env
+            logit_penalty = torch.stack(logits_env).var(1).mean()
+            #import pdb; pdb.set_trace()
+            acts1_penalty = torch.stack(acts1_env).var(1).mean()
+            acts2_penalty = torch.stack(acts2_env).var(1).mean()
+            acts3_penalty = torch.stack(acts3_env).var(1).mean()
+            acts4_penalty = torch.stack(acts4_env).var(1).mean()
+            acts5_penalty = torch.stack(acts5_env).var(1).mean()
+            # single
+            #logit_penalty = torch.cat(logits_env).var(0).mean()
+            # Average loss across envs
+            losses_avg = sum(losses_env) / len(losses_env)
+            gradients_avg = grad(
+                losses_avg, self.net_dummies, create_graph=True)
+            penalty = 0
+            for gradients_this_env in gradients_env:
+                for g_env, g_avg in zip(gradients_this_env, gradients_avg):
+                    if self.version == 1:
+                        penalty += g_env.pow(2).sum()
+                    else:
+                        raise NotImplementedError
+            if self.bias:
+                params = torch.cat([[_ for _ in self.network.parameters()][-2].squeeze(), [_ for _ in self.network.parameters()][-1]])
+            else:
+                params = [_ for _ in self.network.parameters()][-1]
+            l1_penalty = torch.norm(params, 1)
+            obj = (1 - self.hparams["irm_lambda"]) * losses_avg
+            obj += self.hparams["irm_lambda"] * penalty
+            #obj += self.hparams["ib_lambda"] * logit_penalty
+            obj += self.hparams["ib_lambda"] * (logit_penalty + acts1_penalty + acts2_penalty + acts3_penalty + acts4_penalty + acts5_penalty)
+            #obj += self.hparams["ib_lambda"] * (logit_penalty + acts1_penalty + acts2_penalty + acts3_penalty + acts4_penalty + acts5_penalty) / 6
+            #obj += self.hparams["ib_lambda"] * (logit_penalty + (acts1_penalty + acts2_penalty + acts3_penalty + acts4_penalty + acts5_penalty) / (acts1_penalty + acts2_penalty + acts3_penalty + acts4_penalty + acts5_penalty).detach())
+            obj += self.hparams["l1"] * l1_penalty
+            self.optimizer.zero_grad()
+            obj.backward()
+            self.optimizer.step()
+            if callback:
+                # compute errors
+                utils.compute_errors_nonlinear(self, envs)
+
+    def predict(self, x):
+        return self.network(x)
+
+
 MODELS = {
     "ERM": ERM,
     "REx": REx,
@@ -652,5 +795,7 @@ MODELS = {
     "ANDMask": AndMask,
     "IB_ANDMask": IB_AndMask,
     "IGA": IGA,
-    "Oracle": ERM
+    "Oracle": ERM,
+
+    "IB_IRM_NN": IB_IRM_NN
 }

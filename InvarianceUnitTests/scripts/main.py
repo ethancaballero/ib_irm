@@ -92,8 +92,12 @@ def run_experiment(args):
     for split in ("train", "validation", "test"):
         key = "error_" + split
         for k_env, env in zip(envs[split]["keys"], envs[split]["envs"]):
-            args[key + "_" +
-                 k_env] = utils.compute_error(model, *env)
+            if args["model"] == "IB_IRM_NN":
+                args[key + "_" +
+                    k_env] = utils.compute_error_nonlinear(model, *env)
+            else:
+                args[key + "_" +
+                    k_env] = utils.compute_error(model, *env)
 
     # write results
     results_file.write(json.dumps(args))
