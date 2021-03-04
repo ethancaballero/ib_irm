@@ -88,8 +88,6 @@ class assemble_data_mnist_sb:
         dataset=np.concatenate((r,g),axis=0)
         labels=np.concatenate((y[red,:],y[green,:]),axis=0)
 
-        import pdb; pdb.set_trace()
-
         return (dataset,labels,np.ones((num_samples_final,1))*env_index, z_color_final)
     
     
