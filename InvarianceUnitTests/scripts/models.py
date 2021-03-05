@@ -48,7 +48,8 @@ class ERM(Model):
         self.HPARAMS = {}
         self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, -2))
         self.HPARAMS['wd'] = (0., 10**random.uniform(-6, -2))
-        self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
+        #self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
+        self.HPARAMS['l1'] = (0., 0.)
 
         super().__init__(in_features, out_features, bias, task, hparams)
 
@@ -84,7 +85,8 @@ class IB_ERM(Model):
         self.HPARAMS = {}
         self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, -2))
         self.HPARAMS['wd'] = (0., 10**random.uniform(-6, -2))
-        self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
+        #self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
+        self.HPARAMS['l1'] = (0., 0.)
         self.HPARAMS['ib_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
 
         super().__init__(in_features, out_features, bias, task, hparams)
@@ -127,7 +129,8 @@ class REx(Model):
         self.HPARAMS = {}
         self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, -2))
         self.HPARAMS['wd'] = (0., 10**random.uniform(-6, -2))
-        self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
+        #self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
+        self.HPARAMS['l1'] = (0., 0.)
         self.HPARAMS['rex_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
 
         super().__init__(in_features, out_features, bias, task, hparams)
@@ -230,7 +233,8 @@ class IRM(Model):
         self.HPARAMS = {}
         self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, -2))
         self.HPARAMS['wd'] = (0., 10**random.uniform(-6, -2))
-        self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
+        #self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
+        self.HPARAMS['l1'] = (0., 0.)
         self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
 
         super().__init__(in_features, out_features, bias, task, hparams)
@@ -340,7 +344,8 @@ class IB_IRM(Model):
         self.HPARAMS = {}
         self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, -2))
         self.HPARAMS['wd'] = (0., 10**random.uniform(-6, -2))
-        self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
+        #self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
+        self.HPARAMS['l1'] = (0., 0.)
         self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
         self.HPARAMS['ib_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
 
@@ -452,7 +457,8 @@ class AndMask(Model):
         self.HPARAMS = {}
         self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, 0))
         self.HPARAMS['wd'] = (0., 10**random.uniform(-5, 0))
-        #self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
+        ##self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
+        self.HPARAMS['l1'] = (0., 0.)
         self.HPARAMS["tau"] = (0.9, random.uniform(0.8, 1))
         super().__init__(in_features, out_features, bias, task, hparams)
 
@@ -523,7 +529,8 @@ class IB_AndMask(Model):
         self.HPARAMS = {}
         self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, 0))
         self.HPARAMS['wd'] = (0., 10**random.uniform(-5, 0))
-        #self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
+        ##self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
+        self.HPARAMS['l1'] = (0., 0.)
         self.HPARAMS["tau"] = (0.9, random.uniform(0.8, 1))
         self.HPARAMS['ib_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
         super().__init__(in_features, out_features, bias, task, hparams)
@@ -599,7 +606,8 @@ class IGA(Model):
         self.HPARAMS = {}
         self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, -2))
         self.HPARAMS['wd'] = (0., 10**random.uniform(-6, -2))
-        self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
+        #self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
+        self.HPARAMS['l1'] = (0., 0.)
         self.HPARAMS['penalty'] = (1000, 10**random.uniform(1, 5))
         super().__init__(in_features, out_features, bias, task, hparams)
 
@@ -677,7 +685,8 @@ class IB_IRM_NN(Model):
         self.HPARAMS = {}
         self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, -2))
         self.HPARAMS['wd'] = (0., 10**random.uniform(-6, -2))
-        self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
+        #self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
+        self.HPARAMS['l1'] = (0., 0.)
         self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
         self.HPARAMS['ib_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
         super().__init__(in_features, out_features, bias, task, hparams)
