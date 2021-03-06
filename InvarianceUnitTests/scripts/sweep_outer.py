@@ -8,6 +8,7 @@ import argparse
 import getpass
 import subprocess
 import copy
+import os
 
 def ask_for_confirmation():
     response = input('Are you sure? (y/n) ')
@@ -82,5 +83,6 @@ if __name__ == "__main__":
                     cmd += " " + str(a)
             else:
                 cmd += " --" + j + " " + str(args[j])
-        subprocess.Popen(cmd, shell=True)
+        #subprocess.Popen(cmd, shell=True)
+        os.system(cmd)
     #"""
