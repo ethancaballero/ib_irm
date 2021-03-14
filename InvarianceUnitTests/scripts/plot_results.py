@@ -10,10 +10,10 @@ import collect_results
 import numpy as np
 import torch
 
-plt.rc('text', usetex=True)
-plt.rc('text.latex', preamble=r'\usepackage{times,amsmath}')
-plt.rc('font', family='serif')
-plt.rc('font', size=14)
+# plt.rc('text', usetex=True)
+# plt.rc('text.latex', preamble=r'\usepackage{times,amsmath}')
+# plt.rc('font', family='serif')
+# plt.rc('font', size=14)
 
 
 def plot_table(table, dirname, file_name, save=True, block=False, fontsize=12):
