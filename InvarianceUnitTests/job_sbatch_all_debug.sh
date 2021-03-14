@@ -11,12 +11,13 @@ module load python/3.8
 cd /home/ethancab
 source invariance_env/bin/activate
 cd /home/ethancab/research/invariance_unit_test/ib_irm/InvarianceUnitTests
+python scripts/sweep_outer.py --skip_confirmation True --models ERM --datasets Example1 --scratch_dir "/scratch/ethancab" --num_samples 2 --m_start 0 --m_end 2 --d_start 0 --d_end 2
 
 #python scripts/sweep.py --models ERM IRMv1 IB_ERM IB_IRM --datasets Example2 --num_samples 2 --num_data_seeds 2 --num_model_seeds 2
 
 #python scripts/sweep.py --skip_confirmation True --models ERM --datasets Example2 --num_samples 2 --num_data_seeds 2 --num_model_seeds 2
 #python scripts/sweep.py --skip_confirmation True --models ERM --datasets Example2 --num_samples 2 --m_start 0 --m_end 1 --d_start 0 --d_end 1
-python scripts/sweep_outer.py --skip_confirmation True --models ERM --datasets Example1 --scratch_dir "/scratch/ethancab" --num_samples 2 --m_start 0 --m_end 2 --d_start 0 --d_end 2
+#python scripts/sweep_outer.py --skip_confirmation True --models ERM --datasets Example1 --scratch_dir "/scratch/ethancab" --num_samples 2 --m_start 0 --m_end 2 --d_start 0 --d_end 2
 
 # 5. Copy whatever you want to save on $SCRATCH
 #cp $SLURM_TMPDIR/<to_save> $SCRATCH
