@@ -11,4 +11,4 @@ module load python/3.8
 cd /home/ethancab
 source invariance_env/bin/activate
 cd /home/ethancab/research/invariance_unit_test/ib_irm/InvarianceUnitTests
-python scripts/sweep_outer.py --skip_confirmation True --n_envs 10 --models IB_IRM IB_ERM IRMv1 ERM --datasets Example3 --scratch_dir "/scratch/ethancab/res_full_10env/example3_10env"
+python scripts/sweep_outer.py --skip_confirmation True --n_envs 10 --models IB_ERM --datasets Example3s --scratch_dir "/scratch/ethancab/res_full_10env/example3s_10env/IB_ERM"
