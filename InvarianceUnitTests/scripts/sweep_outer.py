@@ -56,6 +56,8 @@ if __name__ == "__main__":
     parser.add_argument('--inv_var', type=float, default=10)
     parser.add_argument('--spur_var', type=float, default=10)
 
+    parser.add_argument('--new_hparam_interval', type=str2bool, default=False)
+
     args = vars(parser.parse_args())
 
     #"""

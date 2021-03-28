@@ -56,6 +56,8 @@ if __name__ == "__main__":
     parser.add_argument('--inv_var', type=float, default=10)
     parser.add_argument('--spur_var', type=float, default=10)
 
+    parser.add_argument('--new_hparam_interval', type=str2bool, default=False)
+
     args = vars(parser.parse_args())
 
     try:
@@ -98,7 +100,9 @@ if __name__ == "__main__":
                         "snr_fg": args["snr_fg"],
                         "snr_bg": args["snr_bg"],
                         "inv_var": args["inv_var"],
-                        "spur_var": args["spur_var"]
+                        "spur_var": args["spur_var"],
+
+                        "new_hparam_interval": args["new_hparam_interval"]
                     }
 
                     all_jobs.append(train_args)

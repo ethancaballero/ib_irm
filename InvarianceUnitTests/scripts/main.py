@@ -57,6 +57,7 @@ def run_experiment(args):
     # selecting model
     args["num_dim"] = args["dim_inv"] + args["dim_spu"]
     model = models.MODELS[args["model"]](
+        args=args,
         in_features=args["num_dim"],
         out_features=1,
         bias=args["bias"],
@@ -131,6 +132,8 @@ if __name__ == "__main__":
     parser.add_argument('--snr_bg', type=float, default=1)
     parser.add_argument('--inv_var', type=float, default=10)
     parser.add_argument('--spur_var', type=float, default=10)
+
+    parser.add_argument('--new_hparam_interval', type=str2bool, default=False)
     args = parser.parse_args()
 
     pprint.pprint(run_experiment(vars(args)))
