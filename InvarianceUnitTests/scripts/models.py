@@ -82,15 +82,19 @@ class ERM(Model):
 
 class IB_ERM(Model):
     def __init__(self, args, in_features, out_features, bias, task, hparams="default"):
+        self.args = args
         self.HPARAMS = {}
         self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, -2))
         self.HPARAMS['wd'] = (0., 10**random.uniform(-6, -2))
         #self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
         self.HPARAMS['l1'] = (0., 0.)
+        """
         if args["new_hparam_interval"]:
             self.HPARAMS['ib_lambda'] = (0.9, 1 - 10**random.uniform(-3, 0.))
         else:
             self.HPARAMS['ib_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
+        #"""
+        self.HPARAMS['ib_lambda'] = (0.1, 1 - 10**random.uniform(-.05, 0.))
 
         super().__init__(args, in_features, out_features, bias, task, hparams)
 
@@ -233,15 +237,19 @@ class IRM(Model):
 
     def __init__(
             self, args, in_features, out_features, bias, task, hparams="default", version=1):
+        self.args = args
         self.HPARAMS = {}
         self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, -2))
         self.HPARAMS['wd'] = (0., 10**random.uniform(-6, -2))
         #self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
         self.HPARAMS['l1'] = (0., 0.)
+        """
         if args["new_hparam_interval"]:
             self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(-3, 0.))
         else:
             self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
+        #"""
+        self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
 
         super().__init__(args, in_features, out_features, bias, task, hparams)
         self.version = version
@@ -314,6 +322,9 @@ class IRM(Model):
                 params = [_ for _ in self.network.parameters()][-1]
             l1_penalty = torch.norm(params, 1)
 
+            if self.args["new_hparam_interval"]:
+                penalty /= len(envs["train"]["envs"])
+
             obj = (1 - self.hparams["irm_lambda"]) * losses_avg
             obj += self.hparams["irm_lambda"] * penalty
             obj += self.hparams["l1"] * l1_penalty
@@ -347,17 +358,22 @@ class IB_IRM(Model):
 
     def __init__(
             self, args, in_features, out_features, bias, task, hparams="default", version=1):
+        self.args = args
         self.HPARAMS = {}
         self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, -2))
         self.HPARAMS['wd'] = (0., 10**random.uniform(-6, -2))
         #self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
         self.HPARAMS['l1'] = (0., 0.)
+        """
         if args["new_hparam_interval"]:
             self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(-3, 0.))
             self.HPARAMS['ib_lambda'] = (0.9, 1 - 10**random.uniform(-3, 0.))
         else:
             self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
             self.HPARAMS['ib_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
+        #"""
+        self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
+        self.HPARAMS['ib_lambda'] = (0.1, 1 - 10**random.uniform(-.05, 0.))
 
         super().__init__(args, in_features, out_features, bias, task, hparams)
         self.version = version
@@ -438,6 +454,9 @@ class IB_IRM(Model):
             else:
                 params = [_ for _ in self.network.parameters()][-1]
             l1_penalty = torch.norm(params, 1)
+
+            if self.args["new_hparam_interval"]:
+                penalty /= len(envs["train"]["envs"])
 
             obj = (1 - self.hparams["irm_lambda"]) * losses_avg
             obj += self.hparams["irm_lambda"] * penalty
@@ -692,17 +711,22 @@ class IB_IRM_NN(Model):
     """
     def __init__(
             self, args, in_features, out_features, bias, task, hparams="default", version=1):
+        self.args = args
         self.HPARAMS = {}
         self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, -2))
         self.HPARAMS['wd'] = (0., 10**random.uniform(-6, -2))
         #self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
         self.HPARAMS['l1'] = (0., 0.)
+        """
         if args["new_hparam_interval"]:
             self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(-3, 0.))
             self.HPARAMS['ib_lambda'] = (0.9, 1 - 10**random.uniform(-3, 0.))
         else:
             self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
             self.HPARAMS['ib_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
+        """
+        self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
+        self.HPARAMS['ib_lambda'] = (0.1, 1 - 10**random.uniform(-.05, 0.))
         super().__init__(args, in_features, out_features, bias, task, hparams)
         self.version = version
         self.network = MLP(in_features, out_features)
@@ -791,6 +815,10 @@ class IB_IRM_NN(Model):
             else:
                 params = [_ for _ in self.network.parameters()][-1]
             l1_penalty = torch.norm(params, 1)
+
+            if self.args["new_hparam_interval"]:
+                penalty /= len(envs["train"]["envs"])
+
             obj = (1 - self.hparams["irm_lambda"]) * losses_avg
             obj += self.hparams["irm_lambda"] * penalty
             #obj += self.hparams["ib_lambda"] * logit_penalty
