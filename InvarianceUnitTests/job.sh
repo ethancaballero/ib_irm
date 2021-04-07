@@ -38,8 +38,8 @@ esac
 done
 
 #scratch_dir = "${a} ${b}"
-#scratch_dir="/scratch/ethancab/res_full_${n_envs}/${datasets}/${models}"
-scratch_dir="/Users/ethancaballero/zzz/debug/res_full_${n_envs}env/${datasets}/${models}"
+scratch_dir="/scratch/ethancab/res_full_${n_envs}/${datasets}/${models}"
+#scratch_dir="/Users/ethancaballero/zzz/debug/res_full_${n_envs}env/${datasets}/${models}"
 
 echo "$new_hparam_interval"
 echo "$n_envs"
