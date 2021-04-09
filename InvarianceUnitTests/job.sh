@@ -7,6 +7,7 @@
 #SBATCH -o /scratch/ethancab/slurm-%j.out  # Write the log in $SCRATCH
 
 new_hparam_interval="True"
+mod_folder_name=""
 
 #n_envs="init"
 #models="init"
@@ -31,6 +32,10 @@ case $i in
     datasets="${i#*=}"
     shift # past argument=value
     ;;
+    -mfn=*|--mod_folder_name=*)
+    mod_folder_name="${i#*=}"
+    shift # past argument=value
+    ;;
     *)
           # unknown option
     ;;
@@ -38,7 +43,7 @@ esac
 done
 
 #scratch_dir = "${a} ${b}"
-scratch_dir="/scratch/ethancab/res_full_${n_envs}/${datasets}/${models}"
+scratch_dir="/scratch/ethancab/res_full_${n_envs}${mod_folder_name}/${datasets}/${models}"
 #scratch_dir="/Users/ethancaballero/zzz/debug/res_full_${n_envs}env/${datasets}/${models}"
 
 echo "$new_hparam_interval"
