@@ -322,8 +322,10 @@ class IRM(Model):
                 params = [_ for _ in self.network.parameters()][-1]
             l1_penalty = torch.norm(params, 1)
 
+            """
             if self.args["new_hparam_interval"]:
                 penalty /= len(envs["train"]["envs"])
+            #"""
 
             obj = (1 - self.hparams["irm_lambda"]) * losses_avg
             obj += self.hparams["irm_lambda"] * penalty
