@@ -8,7 +8,9 @@
 
 new_hparam_interval="True"
 mod_folder_name=""
+d_start="0"
 d_end="20"
+m_start="0"
 m_end="50"
 
 #n_envs="init"
@@ -34,8 +36,16 @@ case $i in
     datasets="${i#*=}"
     shift # past argument=value
     ;;
+    -ds=*|--d_start*)
+    d_start="${i#*=}"
+    shift # past argument=value
+    ;;
     -de=*|--d_end*)
     d_end="${i#*=}"
+    shift # past argument=value
+    ;;
+    -ms=*|--m_start*)
+    m_start="${i#*=}"
     shift # past argument=value
     ;;
     -me=*|--m_end*)
@@ -72,5 +82,5 @@ module load python/3.8
 cd /home/ethancab
 source invariance_env/bin/activate
 cd /home/ethancab/research/invariance_unit_test/ib_irm/InvarianceUnitTests
-python scripts/sweep_outer.py --skip_confirmation True --new_hparam_interval $new_hparam_interval --n_envs $n_envs --models $models --datasets $datasets --d_end $d_end --m_end $m_end --scratch_dir $scratch_dir
+python scripts/sweep_outer.py --skip_confirmation True --new_hparam_interval $new_hparam_interval --n_envs $n_envs --models $models --datasets $datasets --d_start $d_start --d_end $d_end --m_start $m_start --m_end $m_end --scratch_dir $scratch_dir
 #python scripts/sweep_outer.py --skip_confirmation True --new_hparam_interval $new_hparam_interval --n_envs $n_envs --models $models --datasets $datasets --scratch_dir $scratch_dir --num_samples 2 --m_start 0 --m_end 1 --d_start 0 --d_end 1
