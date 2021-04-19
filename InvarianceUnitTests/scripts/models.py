@@ -247,9 +247,9 @@ class IRM(Model):
         if args["new_hparam_interval"]:
             self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(-3, 0.))
         else:
-            self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
+            self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(self.args.irm_lambda_l, self.args.irm_lambda_r))
         #"""
-        self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
+        self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(self.args.irm_lambda_l, self.args.irm_lambda_r))
 
         super().__init__(args, in_features, out_features, bias, task, hparams)
         self.version = version
@@ -371,10 +371,10 @@ class IB_IRM(Model):
             self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(-3, 0.))
             self.HPARAMS['ib_lambda'] = (0.9, 1 - 10**random.uniform(-3, 0.))
         else:
-            self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
+            self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(self.args.irm_lambda_l, self.args.irm_lambda_r))
             self.HPARAMS['ib_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
         #"""
-        self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
+        self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(self.args.irm_lambda_l, self.args.irm_lambda_r))
         self.HPARAMS['ib_lambda'] = (0.1, 1 - 10**random.uniform(-.05, 0.))
 
         super().__init__(args, in_features, out_features, bias, task, hparams)
@@ -724,10 +724,10 @@ class IB_IRM_NN(Model):
             self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(-3, 0.))
             self.HPARAMS['ib_lambda'] = (0.9, 1 - 10**random.uniform(-3, 0.))
         else:
-            self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
+            self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(self.args.irm_lambda_l, self.args.irm_lambda_r))
             self.HPARAMS['ib_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
         """
-        self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
+        self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(self.args.irm_lambda_l, self.args.irm_lambda_r))
         self.HPARAMS['ib_lambda'] = (0.1, 1 - 10**random.uniform(-.05, 0.))
         super().__init__(args, in_features, out_features, bias, task, hparams)
         self.version = version

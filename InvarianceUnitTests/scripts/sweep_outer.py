@@ -58,6 +58,11 @@ if __name__ == "__main__":
 
     parser.add_argument('--new_hparam_interval', type=str2bool, default=False)
 
+    parser.add_argument('--ib_lambda_l', type=float, default=-.05)
+    parser.add_argument('--ib_lambda_r', type=float, default=0.0)
+    parser.add_argument('--irm_lambda_l', type=float, default=-3.0)
+    parser.add_argument('--irm_lambda_r', type=float, default=-.3)
+
     args = vars(parser.parse_args())
 
     #"""

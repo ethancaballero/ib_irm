@@ -4,7 +4,6 @@
 #SBATCH --gres=gpu:0                     # Ask for 0 GPU
 #SBATCH --mem=752G                        # Ask for 752 GB of RAM
 #SBATCH --time=75:00:00                   # The job will run for 3 hours
-#SBATCH -o /scratch/ethancab/slurm-%j.out  # Write the log in $SCRATCH
 
 new_hparam_interval="True"
 mod_folder_name=""
@@ -12,6 +11,9 @@ d_start="0"
 d_end="20"
 m_start="0"
 m_end="50"
+
+user=$USER
+echo "$user"
 
 #n_envs="init"
 #models="init"
