@@ -107,7 +107,12 @@ if __name__ == "__main__":
                         "inv_var": args["inv_var"],
                         "spur_var": args["spur_var"],
 
-                        "new_hparam_interval": args["new_hparam_interval"]
+                        "new_hparam_interval": args["new_hparam_interval"],
+
+                        "ib_lambda_l": args["ib_lambda_l"],
+                        "ib_lambda_r": args["ib_lambda_r"],
+                        "irm_lambda_l": args["irm_lambda_l"],
+                        "irm_lambda_r": args["irm_lambda_r"]
                     }
 
                     all_jobs.append(train_args)
