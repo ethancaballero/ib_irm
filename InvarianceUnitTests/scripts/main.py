@@ -139,6 +139,8 @@ if __name__ == "__main__":
     parser.add_argument('--ib_lambda_r', type=float, default=0.0)
     parser.add_argument('--irm_lambda_l', type=float, default=-3.0)
     parser.add_argument('--irm_lambda_r', type=float, default=-.3)
+
+    parser.add_argument('--ib_bool', type=str2bool, default=False) # whether or not ib_on is used as a hparam
     args = parser.parse_args()
 
     pprint.pprint(run_experiment(vars(args)))

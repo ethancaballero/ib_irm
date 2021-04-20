@@ -95,6 +95,7 @@ class IB_ERM(Model):
             self.HPARAMS['ib_lambda'] = (0.9, 1 - 10**random.uniform(-3, -.3))
         #"""
         self.HPARAMS['ib_lambda'] = (0.1, 1 - 10**random.uniform(-.05, 0.))
+        self.HPARAMS['ib_on'] = (True, random.choice([True, False]))
 
         super().__init__(args, in_features, out_features, bias, task, hparams)
 
@@ -115,7 +116,11 @@ class IB_ERM(Model):
             l1_penalty = torch.norm(params, 1)
             self.optimizer.zero_grad()
             logits = self.network(x)
-            loss = self.loss(logits, y) + self.hparams["ib_lambda"] * logits.var(0).mean() + self.hparams["l1"] * l1_penalty
+            loss = self.loss(logits, y) + self.hparams["l1"] * l1_penalty
+
+            if self.hparams['ib_on'] or (not self.args["ib_bool"]):
+                loss += self.hparams["ib_lambda"] * logits.var(0).mean()
+
             loss.backward()
             self.optimizer.step()
 
@@ -376,6 +381,7 @@ class IB_IRM(Model):
         #"""
         self.HPARAMS['irm_lambda'] = (0.9, 1 - 10**random.uniform(self.args.irm_lambda_l, self.args.irm_lambda_r))
         self.HPARAMS['ib_lambda'] = (0.1, 1 - 10**random.uniform(-.05, 0.))
+        self.HPARAMS['ib_on'] = (True, random.choice([True, False]))
 
         super().__init__(args, in_features, out_features, bias, task, hparams)
         self.version = version
@@ -463,7 +469,9 @@ class IB_IRM(Model):
             obj = (1 - self.hparams["irm_lambda"]) * losses_avg
             obj += self.hparams["irm_lambda"] * penalty
 
-            obj += self.hparams["ib_lambda"] * logit_penalty
+            if self.hparams['ib_on'] or (not self.args["ib_bool"]):
+                obj += self.hparams["ib_lambda"] * logit_penalty
+
             obj += self.hparams["l1"] * l1_penalty
 
             self.optimizer.zero_grad()
