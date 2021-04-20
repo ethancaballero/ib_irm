@@ -690,6 +690,71 @@ class IGA(Model):
         return self.network(x)
 
 
+class IB_IGA(Model):
+    """
+    Inter-environmental Gradient Alignment
+    From https://arxiv.org/abs/2008.01883v2
+    """
+
+    def __init__(self, args, in_features, out_features, bias, task, hparams="default"):
+        self.args = args
+        self.HPARAMS = {}
+        self.HPARAMS["lr"] = (1e-3, 10**random.uniform(-4, -2))
+        self.HPARAMS['wd'] = (0., 10**random.uniform(-6, -2))
+        #self.HPARAMS['l1'] = (0., 10**random.uniform(-6, -2))
+        self.HPARAMS['l1'] = (0., 0.)
+        self.HPARAMS['penalty'] = (1000, 10**random.uniform(1, 5))
+        self.HPARAMS['ib_lambda'] = (0.1, 1 - 10**random.uniform(self.args["ib_lambda_l"], self.args["ib_lambda_r"]))
+        super().__init__(args, in_features, out_features, bias, task, hparams)
+
+        self.optimizer = torch.optim.Adam(
+            self.parameters(),
+            lr=self.hparams["lr"],
+            weight_decay=self.hparams["wd"])
+
+    def fit(self, envs, num_iterations, callback=False):
+        for epoch in range(num_iterations):
+            if self.bias:
+                params = torch.cat([[_ for _ in self.network.parameters()][-2].squeeze(), [_ for _ in self.network.parameters()][-1]])
+            else:
+                params = [_ for _ in self.network.parameters()][-1]
+            l1_penalty = torch.norm(params, 1)
+            logits = []
+            losses = []
+            for x, y in envs["train"]["envs"]:
+                logit = self.network(x)
+                logits.append(logit)
+                loss = self.loss(logit, y)
+                losses.append(loss)
+            #logits = [self.network(x) for x, y in envs["train"]["envs"]]
+            #losses = [self.loss(self.network(x), y) for x, y in envs["train"]["envs"]]
+            logit_penalty = torch.stack(logits).var(1).mean()
+            gradients = [
+                grad(loss, self.parameters(), create_graph=True)
+                for loss in losses
+            ]
+            # average loss and gradients
+            avg_loss = sum(losses) / len(losses)
+            avg_gradient = grad(avg_loss, self.parameters(), create_graph=True)
+
+            # compute trace penalty
+            penalty_value = 0
+            for gradient in gradients:
+                for gradient_i, avg_grad_i in zip(gradient, avg_gradient):
+                    penalty_value += (gradient_i - avg_grad_i).pow(2).sum()
+
+            self.optimizer.zero_grad()
+            (avg_loss + self.hparams['penalty'] * penalty_value + self.hparams["l1"] * l1_penalty + self.hparams["ib_lambda"] * logit_penalty).backward()
+            self.optimizer.step()
+
+            if callback:
+                # compute errors
+                utils.compute_errors(self, envs)
+
+    def predict(self, x):
+        return self.network(x)
+
+
 class MLP(torch.nn.Module):
     def __init__(self, args, in_features, out_features):
         super(MLP, self).__init__()
@@ -856,6 +921,7 @@ MODELS = {
     "ANDMask": AndMask,
     "IB_ANDMask": IB_AndMask,
     "IGA": IGA,
+    "IB_IGA": IB_IGA,
     "Oracle": ERM,
 
     "IB_IRM_NN": IB_IRM_NN
