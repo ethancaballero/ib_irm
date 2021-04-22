@@ -84,6 +84,10 @@ case $i in
     irm_lambda_r="${i#*=}"
     shift # past argument=value
     ;;
+    -nstp=*|--num_samples_test_peak=*)
+    num_samples_test_peak="${i#*=}"
+    shift # past argument=value
+    ;;
     *)
           # unknown option
     ;;
@@ -109,6 +113,8 @@ echo "$ib_lambda_r"
 echo "$irm_lambda_l"
 echo "$irm_lambda_r"
 
+echo "$num_samples_test_peak"
+
 if [[ -n $1 ]]; then
     echo "Argument not recognised"
     exit
@@ -119,5 +125,5 @@ module load python/3.8
 cd $cd1
 source invariance_env/bin/activate
 cd $cd2
-python scripts/sweep_outer.py --skip_confirmation True --new_hparam_interval $new_hparam_interval --ib_bool $ib_bool --n_envs $n_envs --models $models --datasets $datasets --d_start $d_start --d_end $d_end --m_start $m_start --m_end $m_end --ib_lambda_l $ib_lambda_l --ib_lambda_r $ib_lambda_r --irm_lambda_l $irm_lambda_l --irm_lambda_r $irm_lambda_r --scratch_dir $scratch_dir
+python scripts/sweep_outer.py --skip_confirmation True --new_hparam_interval $new_hparam_interval --ib_bool $ib_bool --n_envs $n_envs --models $models --datasets $datasets --d_start $d_start --d_end $d_end --m_start $m_start --m_end $m_end --ib_lambda_l $ib_lambda_l --ib_lambda_r $ib_lambda_r --irm_lambda_l $irm_lambda_l --irm_lambda_r $irm_lambda_r --scratch_dir $scratch_dir --num_samples_test_peak $num_samples_test_peak
 #python scripts/sweep_outer.py --skip_confirmation True --new_hparam_interval $new_hparam_interval --n_envs $n_envs --models $models --datasets $datasets --scratch_dir $scratch_dir --num_samples 2 --m_start 0 --m_end 1 --d_start 0 --d_end 1

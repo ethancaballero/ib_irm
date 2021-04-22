@@ -65,6 +65,7 @@ if __name__ == "__main__":
 
     parser.add_argument('--ib_bool', type=str2bool, default=False) # whether or not ib_on is used as a hparam
 
+    parser.add_argument('--num_samples_test_peak', type=int, default=20)
     args = vars(parser.parse_args())
 
     try:
@@ -116,7 +117,9 @@ if __name__ == "__main__":
                         "irm_lambda_l": args["irm_lambda_l"],
                         "irm_lambda_r": args["irm_lambda_r"],
 
-                        "ib_bool": args["ib_bool"]
+                        "ib_bool": args["ib_bool"],
+
+                        "num_samples_test_peak": args["num_samples_test_peak"],
                     }
 
                     all_jobs.append(train_args)

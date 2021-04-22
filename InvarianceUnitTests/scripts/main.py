@@ -40,12 +40,17 @@ def run_experiment(args):
 
     # sample the envs
     envs = {}
-    for key_split, split in zip(("train", "validation", "test"),
-                                (train_split, train_split, "test")):
+    for key_split, split in zip(("train", "validation", "test", "test_peak"),
+                                (train_split, train_split, "test", "test")):
         envs[key_split] = {"keys": [], "envs": []}
+        if key_split == "test_peak":
+            num_samples = args["num_samples_test_peak"]
+        else:
+            num_samples = args["num_samples"]
+
         for env in dataset.envs:
             envs[key_split]["envs"].append(dataset.sample(
-                n=args["num_samples"],
+                n=num_samples,
                 env=env,
                 split=split)
             )
@@ -90,7 +95,7 @@ def run_experiment(args):
     args["norm"] = norm.data.item()
 
     # compute the train, validation and test errors
-    for split in ("train", "validation", "test"):
+    for split in ("train", "validation", "test", "test_peak"):
         key = "error_" + split
         for k_env, env in zip(envs[split]["keys"], envs[split]["envs"]):
             if args["model"] == "IB_IRM_NN":
@@ -141,6 +146,8 @@ if __name__ == "__main__":
     parser.add_argument('--irm_lambda_r', type=float, default=-.3)
 
     parser.add_argument('--ib_bool', type=str2bool, default=False) # whether or not ib_on is used as a hparam
+
+    parser.add_argument('--num_samples_test_peak', type=int, default=20)
     args = parser.parse_args()
 
     pprint.pprint(run_experiment(vars(args)))

@@ -65,6 +65,7 @@ if __name__ == "__main__":
 
     parser.add_argument('--ib_bool', type=str2bool, default=False) # whether or not ib_on is used as a hparam
 
+    parser.add_argument('--num_samples_test_peak', type=int, default=20)
     args = vars(parser.parse_args())
 
     #"""
