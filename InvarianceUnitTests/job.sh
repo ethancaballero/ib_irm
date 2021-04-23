@@ -9,9 +9,9 @@ new_hparam_interval="True" # this just determines whether irm_loss is normalized
 ib_bool="False" # whether or not ib_on is used as a hparam
 mod_folder_name=""
 d_start="0"
-d_end="20"
+d_end="50"
 m_start="0"
-m_end="50"
+m_end="20"
 
 ib_lambda_l="-.05"
 ib_lambda_r="0.0"
