@@ -18,6 +18,8 @@ ib_lambda_r="0.0"
 irm_lambda_l="-3.0"
 irm_lambda_r="-.3"
 
+num_samples_test_peak="20"
+
 user=$USER
 echo "$user"
 
