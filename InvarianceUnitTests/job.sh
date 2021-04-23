@@ -8,10 +8,10 @@
 new_hparam_interval="True" # this just determines whether irm_loss is normalized by number of envs
 ib_bool="False" # whether or not ib_on is used as a hparam
 mod_folder_name=""
-d_start="0"
-d_end="50"
-m_start="0"
-m_end="20"
+d_start="1"
+d_end="51"
+m_start="1"
+m_end="21"
 
 ib_lambda_l="-.05"
 ib_lambda_r="0.0"

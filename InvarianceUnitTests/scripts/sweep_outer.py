@@ -32,13 +32,13 @@ if __name__ == "__main__":
     #parser.add_argument('--num_data_seeds', type=int, default=50)
     #parser.add_argument('--num_model_seeds', type=int, default=20)
 
-    parser.add_argument('--m_start', default=0, type=int,
+    parser.add_argument('--m_start', default=1, type=int,
                         help='')
-    parser.add_argument('--m_end', default=20, type=int,
+    parser.add_argument('--m_end', default=21, type=int,
                         help='')
-    parser.add_argument('--d_start', default=0, type=int,
+    parser.add_argument('--d_start', default=1, type=int,
                         help='')
-    parser.add_argument('--d_end', default=50, type=int,
+    parser.add_argument('--d_end', default=51, type=int,
                         help='')
     
     parser.add_argument('--output_dir', type=str, default="results")
