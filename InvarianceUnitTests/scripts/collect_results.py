@@ -8,6 +8,9 @@ import argparse
 import matplotlib.pyplot as plt
 import plot_results
 
+def str2bool(v):
+  return v.lower() in ("yes", "true", "t", "1")
+
 def print_row(row, col_width=15, latex=False):
     sep = " & " if latex else "  "
     end_ = "\\\\" if latex else ""
@@ -59,7 +62,12 @@ def print_table_hparams(table, col_width=15, latex=False):
         print("\n")
 
 
-def build_table(dirname, models=None, n_envs=None, num_dim=None, latex=False, standard_error=False):
+def build_table(dirname, models=None, n_envs=None, num_dim=None, latex=False, standard_error=False, test_peak=False):
+    if test_peak:
+        error_min = "error_test_peak"
+    else:
+        error_min = "error_validation"
+
     records = []
     for fname in glob.glob(os.path.join(dirname, "*.jsonl")):
         with open(fname, "r") as f:
@@ -107,7 +115,7 @@ def build_table(dirname, models=None, n_envs=None, num_dim=None, latex=False, st
             df_d_m = df_d[df_d["model"] == model]
 
             best_model_seed = df_d_m.groupby("model_seed").mean().filter(
-                regex='error_validation').sum(1).idxmin()
+                regex=error_min).sum(1).idxmin()
 
             # filtered by hparams
             df_d_m_s = df_d_m[df_d_m["model_seed"] == best_model_seed].filter(
@@ -164,10 +172,11 @@ if __name__ == "__main__":
     parser.add_argument('--models', nargs='+', default=None)
     parser.add_argument('--num_dim', type=int, default=None)
     parser.add_argument('--n_envs', type=int, default=None)
+    parser.add_argument('--test_peak', type=str2bool, default=False)
     args = parser.parse_args()
 
     table, table_avg, table_hparams, table_val, table_val_avg, df = build_table(
-        args.dirname, args.models, args.n_envs, args.num_dim, args.latex)
+        args.dirname, args.models, args.n_envs, args.num_dim, args.latex, standard_error=False, test_peak=args.test_peak)
 
     # Print table and averaged table
     print_table(table, latex=args.latex)
