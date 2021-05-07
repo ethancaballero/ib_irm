@@ -7,6 +7,7 @@ import json
 import argparse
 import matplotlib.pyplot as plt
 import plot_results
+from scipy import stats
 
 def str2bool(v):
   return v.lower() in ("yes", "true", "t", "1")
@@ -87,6 +88,7 @@ def build_table(dirname, models=None, n_envs=None, num_dim=None, latex=False, st
 
     table = {}
     table_avg = {}
+    table_m_seeds = {}
     table_val = {}
     table_val_avg = {
         "data" : {},
@@ -151,6 +153,7 @@ def build_table(dirname, models=None, n_envs=None, num_dim=None, latex=False, st
             # Avg
             if dataset not in table_avg:
                 table_avg[dataset] = {}
+                table_m_seeds[dataset] = {}
             table_test_errors = df_d_m_s[["error_test_E" +
                                           str(env) for env in range(len(envs))]]
             mean = table_test_errors.mean(axis=0).mean(axis=0)
@@ -161,8 +164,9 @@ def build_table(dirname, models=None, n_envs=None, num_dim=None, latex=False, st
                 "std":float(std),
                 "hparams": table_hparams[dataset][model]
                 }
+            table_m_seeds[dataset][model] = table_test_errors.mean(axis=1)
 
-    return table, table_avg, table_hparams, table_val, table_val_avg, df
+    return table, table_avg, table_hparams, table_val, table_val_avg, df, table_m_seeds
 
 
 if __name__ == "__main__":
@@ -173,10 +177,16 @@ if __name__ == "__main__":
     parser.add_argument('--num_dim', type=int, default=None)
     parser.add_argument('--n_envs', type=int, default=None)
     parser.add_argument('--test_peak', type=str2bool, default=False)
+    parser.add_argument('--t_test', type=str2bool, default=False)
     args = parser.parse_args()
 
-    table, table_avg, table_hparams, table_val, table_val_avg, df = build_table(
+    table, table_avg, table_hparams, table_val, table_val_avg, df, table_m_seeds = build_table(
         args.dirname, args.models, args.n_envs, args.num_dim, args.latex, standard_error=False, test_peak=args.test_peak)
+
+    if args.t_test and args.models != None:
+        for k in table_m_seeds.keys():
+            tt = stats.ttest_ind(table_m_seeds[k][args.models[0]], table_m_seeds[k][args.models[1]])
+            print(k, args.models[0], args.models[0], "t-test:", tt)
 
     # Print table and averaged table
     print_table(table, latex=args.latex)
