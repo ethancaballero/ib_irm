@@ -56,15 +56,6 @@ if __name__ == "__main__":
     parser.add_argument('--inv_var', type=float, default=10)
     parser.add_argument('--spur_var', type=float, default=10)
 
-    parser.add_argument('--new_hparam_interval', type=str2bool, default=False)
-
-    parser.add_argument('--ib_lambda_l', type=float, default=-.05)
-    parser.add_argument('--ib_lambda_r', type=float, default=0.0)
-    parser.add_argument('--irm_lambda_l', type=float, default=-3.0)
-    parser.add_argument('--irm_lambda_r', type=float, default=-.3)
-
-    parser.add_argument('--ib_bool', type=str2bool, default=False) # whether or not ib_on is used as a hparam
-
     parser.add_argument('--num_samples_test_peak', type=int, default=20)
     args = vars(parser.parse_args())
 
@@ -109,15 +100,6 @@ if __name__ == "__main__":
                         "snr_bg": args["snr_bg"],
                         "inv_var": args["inv_var"],
                         "spur_var": args["spur_var"],
-
-                        "new_hparam_interval": args["new_hparam_interval"],
-
-                        "ib_lambda_l": args["ib_lambda_l"],
-                        "ib_lambda_r": args["ib_lambda_r"],
-                        "irm_lambda_l": args["irm_lambda_l"],
-                        "irm_lambda_r": args["irm_lambda_r"],
-
-                        "ib_bool": args["ib_bool"],
 
                         "num_samples_test_peak": args["num_samples_test_peak"],
                     }

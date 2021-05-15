@@ -138,15 +138,6 @@ if __name__ == "__main__":
     parser.add_argument('--inv_var', type=float, default=10)
     parser.add_argument('--spur_var', type=float, default=10)
 
-    parser.add_argument('--new_hparam_interval', type=str2bool, default=False)
-
-    parser.add_argument('--ib_lambda_l', type=float, default=-.05)
-    parser.add_argument('--ib_lambda_r', type=float, default=0.0)
-    parser.add_argument('--irm_lambda_l', type=float, default=-3.0)
-    parser.add_argument('--irm_lambda_r', type=float, default=-.3)
-
-    parser.add_argument('--ib_bool', type=str2bool, default=False) # whether or not ib_on is used as a hparam
-
     parser.add_argument('--num_samples_test_peak', type=int, default=20)
     args = parser.parse_args()
 
